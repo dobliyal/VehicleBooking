@@ -1,9 +1,16 @@
 import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { TextField, Button, Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+interface PersonalDetailsForm {
+  name: string;
+  email: string;
+  phone: string;
+  address?: string;
+}
 
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
@@ -12,24 +19,23 @@ const schema = yup.object().shape({
   address: yup.string(),
 });
 
-function PersonalDetails() {
-  const { control, handleSubmit, formState: { errors } } = useForm({
-    // defaultValues: {...formData},
+const PersonalDetails: React.FC = () => {
+  const { control, handleSubmit, formState: { errors } } = useForm<PersonalDetailsForm>({
     resolver: yupResolver(schema),
   });
+  
   const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    //updateFormData(data);
-    localStorage.setItem('personalDetails',JSON.stringify(data));
+  const onSubmit: SubmitHandler<PersonalDetailsForm> = (data) => {
+    localStorage.setItem('personalDetails', JSON.stringify(data));
     navigate('/service-details');
   };
 
   return (
     <Container>
       <form onSubmit={handleSubmit(onSubmit)}>
-      <h1>Personal Details</h1>
-        <Controller 
+        <h1>Personal Details</h1>
+        <Controller
           name="name"
           control={control}
           render={({ field }) => (
@@ -95,7 +101,6 @@ function PersonalDetails() {
       </form>
     </Container>
   );
-}
+};
 
 export default PersonalDetails;
-

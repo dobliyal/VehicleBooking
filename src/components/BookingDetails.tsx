@@ -1,23 +1,28 @@
 import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { TextField, Button, Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+interface BookingDetailsForm {
+  appointmentDate: string;
+  appointmentTime: string;
+}
+
 const schema = yup.object().shape({
-  appointmentDate: yup.date().required('Appointment date is required'),
+  appointmentDate: yup.string().required('Appointment date is required'),
   appointmentTime: yup.string().required('Appointment time is required'),
 });
 
-function BookingDetails() {
-  const { control, handleSubmit, formState: { errors } } = useForm({
+const BookingDetails: React.FC = () => {
+  const { control, handleSubmit, formState: { errors } } = useForm<BookingDetailsForm>({
     resolver: yupResolver(schema),
   });
 
   const navigate = useNavigate();
 
-const onSubmit = (data) => {
+  const onSubmit: SubmitHandler<BookingDetailsForm> = (data) => {
     const formattedData = {
       ...data,
       appointmentDate: new Date(data.appointmentDate).toISOString().split('T')[0],
@@ -25,6 +30,7 @@ const onSubmit = (data) => {
     localStorage.setItem('bookingDetails', JSON.stringify(formattedData));
     navigate('/confirmation');
   };
+
   return (
     <Container>
       <form onSubmit={handleSubmit(onSubmit)}>
